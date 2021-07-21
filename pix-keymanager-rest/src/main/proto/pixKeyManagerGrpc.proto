@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "br.com.zup";
+option java_outer_classname = "PixKeyManagerGrpc";
+option objc_class_prefix = "HLW";
+import "google/protobuf/timestamp.proto";
+
+package br.com.zup;
+
+service PixService {
+  rpc novaChavePix (NovaPixKeyRequest) returns (NovaPixKeyResponse) {}
+  rpc deletaChavePix (DeletaKeyRequest) returns (DeletaKeyResponse) {}
+  rpc consultaChavePix (ConsultaKeyRequest) returns (ConsultaKeyResponse) {}
+  rpc listaChavesPix (ListaKeyRequest) returns (ListaKeyResponse) {}
+}
+
+enum  TipoChave{
+  INVALIDA = 0;
+  CPF = 1;
+  TELEFONE = 2;
+  EMAIL = 3;
+  ALEATORIA = 4;
+}
+
+enum TipoConta{
+  INDEFINIDO = 0;
+  CONTA_CORRENTE = 1;
+  CONTA_POUPANCA = 2;
+}
+
+message NovaPixKeyRequest {
+  string idCliente = 1;
+  TipoChave tipoChave = 2;
+  string key = 3;
+  TipoConta tipoConta = 4;
+}
+
+message NovaPixKeyResponse {
+  int64 pixId = 1;
+}
+
+message DeletaKeyRequest{
+  int64 pixId = 1;
+  string idCliente = 2;
+}
+
+message DeletaKeyResponse{
+  string mensagem = 1;
+}
+
+message ConsultaKeyRequest{
+  int64 pixId = 1;
+  string idCliente = 2;
+  string chave = 3;
+}
+
+message ConsultaKeyResponse{
+  string tipoChave = 1;
+  string key = 2;
+  string nome= 3;
+  string cpf = 4;
+  message DadosConta{
+    string instituicao = 1;
+    string agencia = 2;
+    string numero = 3;
+    TipoConta tipoConta = 4;
+  }
+  DadosConta dadosConta = 5;
+  google.protobuf.Timestamp datacriacao = 6;
+  int64 pixId = 7;
+  string  idCliente = 8;
+}
+
+message ListaKeyRequest{
+  string idCliente = 1;
+}
+
+message ListaKeyResponse{
+  message DadosChave{
+    int64 pixId = 1;
+    string tipoChave = 2;
+    string chave = 3;
+    TipoConta tipoConta = 4;
+    google.protobuf.Timestamp datacriacao = 5;
+  }
+  string idCliente = 1;
+  repeated DadosChave dadosChave = 2;
+}
