@@ -1,3 +1,13 @@
 micronaut:
   application:
     name: pixKeymanagerRest
+
+grpc:
+  client:
+    plaintext: true
+    max-retry-attemps: 10
+  channels:
+    chavePix:
+      address: 'localhost:50051'
+      plaintext: true
+      max-retry-attemps: 10
