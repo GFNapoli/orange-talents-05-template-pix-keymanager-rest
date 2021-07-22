@@ -1,11 +1,7 @@
 package br.com.zup.keyManager
 
-import br.com.zup.NovaPixKeyRequest
-import br.com.zup.PixServiceGrpc
-import br.com.zup.TipoChave
-import br.com.zup.TipoConta
+import br.com.zup.*
 import br.com.zup.keyManager.dto.CadastraChaveRequest
-import br.com.zup.keyManager.dto.CadastraChaveResponse
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.micronaut.http.HttpResponse
@@ -32,16 +28,15 @@ class ChaveController (@Inject val pixClient: PixServiceGrpc.PixServiceBlockingS
                 .setKey(request.key)
                 .setTipoConta(TipoConta.forNumber(request.tipoConta))
                 .build()
-            println(grpcRequest)
             val response = pixClient.novaChavePix(grpcRequest)
-            return HttpResponse.ok(CadastraChaveResponse(response.pixId))
+            println(response.pixId)
+            return HttpResponse.created(HttpResponse.uri("/chavePix/${request.idCliente}/pix/${response.pixId}"))
         }catch (e: StatusRuntimeException){
 
             val status = e.status
             val statusCode = status.code
             val description = status.description
 
-            println("$statusCode   $description")
             if(statusCode == Status.Code.ALREADY_EXISTS || statusCode == Status.Code.INVALID_ARGUMENT){
                 throw HttpStatusException(HttpStatus.BAD_REQUEST, description)
             }
