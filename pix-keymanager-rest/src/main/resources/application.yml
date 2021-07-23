@@ -8,6 +8,6 @@ grpc:
     max-retry-attemps: 10
   channels:
     chavePix:
-      address: 'localhost:50051'
+      address: ${GRPC_URL:`localhost:50051`}
       plaintext: true
       max-retry-attemps: 10
