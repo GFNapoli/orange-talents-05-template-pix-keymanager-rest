@@ -2,6 +2,7 @@ package br.com.zup.keyManager
 
 import br.com.zup.*
 import br.com.zup.keyManager.dto.CadastraChaveRequest
+import br.com.zup.keyManager.dto.DadosChaveResponse
 import br.com.zup.keyManager.dto.DetalhesChavePix
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -101,6 +102,28 @@ class ChaveController (@Inject val pixClient: PixServiceGrpc.PixServiceBlockingS
             }
             if(Status.INVALID_ARGUMENT.code == statusCode ||
                     Status.FAILED_PRECONDITION.code == statusCode){
+                throw HttpStatusException(HttpStatus.BAD_REQUEST, description)
+            }
+
+            throw HttpStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.message)
+        }
+    }
+
+    @Get("/list/{idClient}")
+    fun listaChaves(@PathVariable idClient: String): HttpResponse<Any>{
+
+        try {
+            val grpcRequest = ListaKeyRequest.newBuilder().setIdCliente(idClient).build()
+            val grpcResponse = pixClient.listaChavesPix(grpcRequest)
+            val response = grpcResponse.dadosChaveList.map { DadosChaveResponse(it) }
+            return HttpResponse.ok(response)
+        }catch (e: StatusRuntimeException){
+
+            val status = e.status
+            val statusCode = status.code
+            val description = status.description
+
+            if (Status.INVALID_ARGUMENT.code == statusCode){
                 throw HttpStatusException(HttpStatus.BAD_REQUEST, description)
             }
 

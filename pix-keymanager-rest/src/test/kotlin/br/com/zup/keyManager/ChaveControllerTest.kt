@@ -19,6 +19,7 @@ import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.jetbrains.annotations.NotNull
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.mockito.Mockito
@@ -103,5 +104,31 @@ internal class ChaveControllerTest {
         val response = httpClient.toBlocking().exchange(request, Any::class.java)
 
         assertEquals(HttpStatus.OK, response.status)
+        assertNotNull(response.body())
+    }
+
+    @Test
+    internal fun `consultar lista de chaves`() {
+
+        val pixResponse = ListaKeyResponse.newBuilder()
+            .setIdCliente("ae93a61c-0642-43b3-bb8e-a17072295955")
+            .addDadosChave(ListaKeyResponse.DadosChave.newBuilder()
+                .setPixId(1)
+                .setTipoChave("CPF")
+                .setChave("12345678902")
+                .setTipoConta(TipoConta.CONTA_CORRENTE)
+                .setDatacriacao(Timestamp.newBuilder()
+                    .setSeconds(1231321321)
+                    .setNanos(121).build())
+                .build())
+            .build()
+
+        BDDMockito.given(grpcCLient.listaChavesPix(Mockito.any())).willReturn(pixResponse)
+
+        val request = HttpRequest.GET<Any>("/chavePix/list/ae93a61c-0642-43b3-bb8e-a17072295955")
+        val response = httpClient.toBlocking().exchange(request, Any::class.java)
+
+        assertEquals(HttpStatus.OK, response.status)
+        assertNotNull(response.body())
     }
 }
